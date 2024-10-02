@@ -4,12 +4,14 @@
 \alias{tasasLecap}
 \title{Tasas Lecap}
 \usage{
-tasasLecap(df, settle = "t+1")
+tasasLecap(df, settle = "t+1", ...)
 }
 \arguments{
 \item{df}{data.frame con los datos de los bonos}
 
 \item{settle}{fecha de liquidación de la operación. Puede ser "t+0" o "t+1" versus la fecha del precio}
+
+\item{...}{argumentos adicionales para dbGetTable}
 }
 \value{
 data.frame recibido con el agregado de todos los calculos realizados
