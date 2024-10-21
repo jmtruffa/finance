@@ -16,7 +16,7 @@ tasasLecap = function(df, settle = "t+1", ...) {
   require(bizdays)
   require(tidyverse)
   cal = create.calendar('cal', dbGetTable("calendarioFeriados", ...)$date, weekdays = c('saturday','sunday'))
-  settle = ifelse(settlement == 't+0', 0, 1)
+  settle = ifelse(settle == 't+0', 0, 1)
   datos = functions::dbGetTable(table = "lecaps", ...)
   df= left_join(df, datos)
   df$settle = bizdays::add.bizdays(df$date, settle, cal = cal)
@@ -31,5 +31,6 @@ tasasLecap = function(df, settle = "t+1", ...) {
   df$tem360 = ((1 + df$tdirecta)^(30/df$dias360)) - 1
   df$duration = df$dias
   df$mduration = round(df$duration / (1 + df$tea),0)
+  df = df %>% filter(dias360 !=0)
   return(df)
 }
