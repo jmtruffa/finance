@@ -4,20 +4,14 @@
 \alias{getLecaps}
 \title{getLecaps}
 \usage{
-getLecaps(date = Sys.Date(), ...)
-}
-\arguments{
-\item{date}{Fecha en formato "YYYY-MM-DD". Por defecto la fecha actual.}
-
-\item{...}{Parametros de conexion a la base de datos}
+getLecaps(...)
 }
 \value{
-Vector con los tickers de las Lecaps vigentes
+Vector con los tickers de las Lecaps vigentes y resto de info.
 }
 \description{
-Devuelve las Lecaps vigentes segun fecha provista
+Devuelve las Lecaps
 }
 \examples{
-getLecaps("2024-08-10")
 getLecaps()
 }
