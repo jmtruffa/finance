@@ -1,5 +1,5 @@
 #' @title Calcula la inflación BE
-#' @description Calcula la inflación BE
+#' @description Calcula la inflación BE a una fecha puntual. Para ejecutar un rago, deberá ser llamada cada vez y concatenar.
 #' @param fecha Fecha de cálculo
 #' @param ... Argumentos adicionales como server y port
 #' @return Dataframe con la inflación BE
@@ -23,10 +23,11 @@ inflacionbe = function(fecha, ...) {
   fecha = zoo::as.Date(fecha)
   
   # LECAPS
-  lecaps = getLecaps(fecha, server = server, port = port) %>% 
+  lecaps = getLecaps(...) %>% # viejo era getLecaps(fecha, ...)
     mutate(
       type = ifelse(str_detect(ticker, "S"), "LETRAS", "BONOS")
     )
+  
   curva_lecaps = methodsPPI::getPPIPrices(
     token = methodsPPI::getPPILogin2()$token, 
     ticker = lecaps$ticker, 
@@ -39,10 +40,11 @@ inflacionbe = function(fecha, ...) {
     port = port)
   print(paste0("Fallaron: ", curva_lecaps[[2]]$ticker))
   curva_lecaps = tasasLecap(curva_lecaps[[1]], ...)
+  
   lecap = curva_lecaps %>% select(date, ticker, tir = tea, duration = mduration)
   
   # CER
-  tickersBonosCER = map_dfr(.x = "bonosCER", .f = methodsPPI::sets, ...)
+  tickersBonosCER = map_dfr(.x = "bonosCER", .f = methodsPPI::sets)
   resultBonosCER = getPPIPrices(token = methodsPPI::getPPILogin2()$token,
                                                ticker = tickersBonosCER$ticker, 
                                                type = tickersBonosCER$type, 
@@ -77,7 +79,8 @@ inflacionbe = function(fecha, ...) {
   lecapAdjusted = lecap[lecap$tir != outliers::outlier(lecap$tir), ] %>% left_join(venc) %>% mutate(diasVto = as.numeric(vto - as.Date(settle)), diasVto2 = diasVto^2)
   
   # Define model
-  plazoMax = max(lecapAdjusted$diasVto) + round(365 * 0.5, digits = 0)
+  # plazo máximo que tomará de los bonos CER para calcular el modelo
+  plazoMax = max(lecapAdjusted$diasVto) + round(365 * 1.5, digits = 0)
   cerAdjusted = cerAdjusted %>% filter(diasVto <= plazoMax)
   modelCER = lm(tir ~ diasVto + diasVto2, data = cerAdjusted)
   modeloLecap = lm(tir ~ diasVto + diasVto2, data = lecapAdjusted)

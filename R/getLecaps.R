@@ -11,6 +11,6 @@ getLecaps = function(...) {
   require(functions)
   #query = paste0("SELECT ticker FROM lecaps WHERE date_vto >= '",date, "' AND date_liq <= '",date, "'")
   query = paste0("SELECT * FROM lecaps")
-  functions::dbExecuteQuery(query, ...)
+  functions::dbExecuteQuery(query = query, ...)
 }
 
