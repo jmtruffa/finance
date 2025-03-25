@@ -23,34 +23,44 @@ inflacionbe = function(fecha, ...) {
   fecha = zoo::as.Date(fecha)
   
   # LECAPS
-  lecaps = getLecaps(...) %>% # viejo era getLecaps(fecha, ...)
+  lecaps = getLecaps(server = server, port = port) %>% 
     mutate(
-      type = ifelse(str_detect(ticker, "S"), "LETRAS", "BONOS")
-    )
-  
+      type = ifelse(str_detect(ticker, "^S"), "LETRAS", "BONOS")
+    ) %>%  filter(date_vto >= fecha)
+  #lecaps = lecaps %>% filter(date_vto >= fecha)
+  print("Consulta de Lecaps...")
+  getPPILogin()
   curva_lecaps = methodsPPI::getPPIPrices(
-    token = methodsPPI::getPPILogin2()$token, 
+    token = token$token, 
     ticker = lecaps$ticker, 
     type = lecaps$type,
     from = fecha, 
     to = fecha, 
     settlement = "A-24HS",
     # poner luego elipsis para server y port y sacar eso.
-    server = server,
-    port = port)
+    #)
+     server = server,
+     port = port)
   print(paste0("Fallaron: ", curva_lecaps[[2]]$ticker))
-  curva_lecaps = tasasLecap(curva_lecaps[[1]], ...)
+  curva_lecaps = tasasLecap(curva_lecaps[[1]], port = port, server = server)
   
   lecap = curva_lecaps %>% select(date, ticker, tir = tea, duration = mduration)
   
   # CER
-  tickersBonosCER = map_dfr(.x = "bonosCER", .f = methodsPPI::sets)
-  resultBonosCER = getPPIPrices(token = methodsPPI::getPPILogin2()$token,
+  print("Trayendo bonos CER de la DB...")
+  tickersBonosCER = map_dfr(.x = "bonosCER", .f = methodsPPI::sets, server = server, port = port)
+  vtos = dbGetTable("vencTitulos", server = server, port = port)
+  tickersBonosCER = tickersBonosCER %>% left_join(vtos, join_by(ticker)) %>% 
+    filter(vto > from)
+  print("Trayendo precios de CER de PPI...")
+  resultBonosCER = getPPIPrices(token = token$token,
                                                ticker = tickersBonosCER$ticker, 
                                                type = tickersBonosCER$type, 
                                                from = fecha, 
                                                to = fecha, 
-                                               settlement = "A-24HS")
+                                               settlement = "A-24HS",
+                                server = server,
+                                port = port)
   resultBonosCER[[2]]
   resultBonosCER = resultBonosCER[[1]]
   
@@ -93,7 +103,8 @@ inflacionbe = function(fecha, ...) {
   if (dia_actual < 15) {
     fecha_inicio = as.Date(sprintf("%04d-%02d-15", year(settle), month(settle)))
   } else {
-    fecha_inicio = as.Date(sprintf("%04d-%02d-15", year(settle), month(settle) + 1))
+    ### hay que arreglar esto porque cuando es 12, no suma bien. Pone 13
+    fecha_inicio = as.Date(sprintf("%04d-%02d-15", year(settle), month(settle))) %m+% months(1)
   }
   
   fecha_final = as.Date(sprintf("%04d-%02d-15", anio_final, mes_final))
