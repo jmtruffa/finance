@@ -13,7 +13,7 @@ cal <- create.calendar(
   weekdays  = c("saturday", "sunday")
 )
 start_date <- as.Date("2025-04-14")   # donde arrancan las bandas
-end_date   <- as.Date("2026-12-31")
+end_date   <- as.Date("2027-12-31")
 
 dates <- bizseq(start_date, end_date, cal = "cal")   # vector Date
 meses_dec <- time_length(interval(start_date, dates), unit = "months")
