@@ -15,7 +15,7 @@ inflacionbe(fecha, ...)
 Dataframe con la inflación BE
 }
 \description{
-Calcula la inflación BE
+Calcula la inflación BE a una fecha puntual. Para ejecutar un rago, deberá ser llamada cada vez y concatenar.
 }
 \examples{
 inflacionbe("2021-01-01")
