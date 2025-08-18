@@ -1,6 +1,6 @@
-#' @title Tasas Lecap
-#' @description Calcula las tasas y duration de las lecap. Obtiene de la tabla "lecaps" los
-#' vencimientos y valores finales de cada lecap de la base de datos. Calcula las tasas directas,
+#' @title Tasas Tamar
+#' @description Calcula las tasas y duration de las tamar. Obtiene de la tabla "tamar" los
+#' vencimientos de cada titulo a tamar de la base de datos. Calcula los vpv, tasas directas,
 #' tna, tea, tem, tna360, tea360, tem360 y duration de cada lecap.
 #' Necesita que el df tenga date, price, ticker
 #' @param df data.frame con los datos de los bonos
@@ -11,19 +11,38 @@
 #' tasasLecap(df, settle = "t+1")
 #'
 #'
-tasasLecap = function(df, settle = "t+1", ...) {
+tasasTamar = function(df, settle = "t+1", ...) {
   require(functions)
   require(bizdays)
   require(tidyverse)
   functions::setup()
   cal = create.calendar('cal', dbGetTable("calendarioFeriados", server = server, port = port)$date, weekdays = c('saturday','sunday'))
   settle = ifelse(settle == 't+0', 0, 1)
-  datos = functions::dbGetTable(table = "lecaps", server = server, port = port)
-  df= left_join(df, datos)
+  datos = functions::dbGetTable(table = "tamar", server = server, port = port)
+  tamar = bcra::getDatosVariable(idVariable = 136, desde = "2024-01-01", hasta = Sys.Date()) %>% mutate(valor = valor / 100)
+  df = left_join(df, datos) %>%
+    mutate(
+      date_start = add.bizdays(date_liq, - 10, cal),
+      date_end = add.bizdays(date, - 9, cal)
+    ) %>%
+  rowwise() %>%
+    mutate(
+      tamar_prom_tna = mean(
+        tamar %>%
+          filter(date >= date_start & date <= date_end) %>%
+          pull(valor),
+        na.rm = TRUE
+      ),
+      tamar_tem = ( ( 1 + tamar_prom_tna * 32 / 365 ) ^ (365/32) ) ^(1/12)-1,
+      vpv = 100 * (1 + tamar_tem) ^ ( (days360(date_liq, date_vto) / 360) * 12 ),
+      tem =  (vpv / price) ^ (1 / ((as.numeric(date_vto - date) / 360) * 12)) - 1
+    ) %>%
+    ungroup()
+
   df$settle = bizdays::add.bizdays(df$date, settle, cal = cal)
   df$dias360 = functions::days360(df$settle, df$date_vto)
   df$dias = as.numeric(df$date_vto - df$settle)
-  df$tdirecta = (df$vf / df$price) - 1
+  df$tdirecta = (df$vpv / df$price) - 1
   df$tna = df$tdirecta * 365 / df$dias
   df$tea = ((1 + df$tdirecta)^(365/df$dias)) - 1
   df$tem = ((1 + df$tdirecta)^(30/df$dias)) - 1

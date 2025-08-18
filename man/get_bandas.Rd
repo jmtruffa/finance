@@ -4,7 +4,7 @@
 \alias{get_bandas}
 \title{get_bandas}
 \usage{
-get_bandas()
+get_bandas(end_date = "2027-12-31")
 }
 \value{
 Un data frame con las bandas superior e inferior y la fecha.
