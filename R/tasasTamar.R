@@ -33,7 +33,7 @@ tasasTamar = function(df, settle = "t+1", ...) {
           pull(valor),
         na.rm = TRUE
       ),
-      tamar_tem = ( ( 1 + tamar_prom_tna * 32 / 365 ) ^ (365/32) ) ^(1/12)-1,
+      tamar_tem = ( ( 1 + (tamar_prom_tna + tasa) * 32 / 365 ) ^ (365/32) ) ^(1/12)-1,
       vpv = 100 * (1 + tamar_tem) ^ ( (days360(date_liq, date_vto) / 360) * 12 ),
       tem =  (vpv / price) ^ (1 / ((as.numeric(date_vto - date) / 360) * 12)) - 1
     ) %>%
@@ -54,3 +54,4 @@ tasasTamar = function(df, settle = "t+1", ...) {
   df = df %>% filter(dias360 !=0)
   return(df)
 }
+
