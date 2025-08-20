@@ -52,6 +52,6 @@ tasasTamar = function(df, settle = "t+1", ...) {
   df$duration = df$dias
   df$mduration = round(df$duration / (1 + df$tea),0)
   df = df %>% filter(dias360 !=0)
-  return(df)
+  return(df %>% select(-c(date_start, date_end)))
 }
 
