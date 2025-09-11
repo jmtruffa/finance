@@ -15,7 +15,7 @@ tasasTamar = function(df, settle = "t+1", ...) {
   require(functions)
   require(bizdays)
   require(tidyverse)
-  functions::setup()
+
   cal = create.calendar('cal', dbGetTable("calendarioFeriados", server = server, port = port)$date, weekdays = c('saturday','sunday'))
   settle = ifelse(settle == 't+0', 0, 1)
   datos = functions::dbGetTable(table = "tamar", server = server, port = port)
