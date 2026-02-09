@@ -8,15 +8,37 @@
 #' @param ... argumentos adicionales para dbGetTable
 #' @return data.frame recibido con el agregado de todos los calculos realizados
 #' @examples
+#' \dontrun{
 #' tasasLecap(df, settle = "t+1")
-#'
+#' }
 #'
 tasasLecap = function(df, settle = "t+1", ...) {
-  require(functions)
-  require(bizdays)
-  require(tidyverse)
+  if (is.null(server) || is.null(port)) {
+    # Si alguna variable global no existe, llamar a setup() para establecerlas
+    if (!exists("server", envir = .GlobalEnv) || !exists("port", envir = .GlobalEnv)) {
+      if (exists("setup", envir = asNamespace("functions"))) {
+        functions::setup()
+      }
+    }
 
-  cal = create.calendar('cal', dbGetTable("calendarioFeriados", server = server, port = port)$date, weekdays = c('saturday','sunday'))
+    # Usar las variables globales (ya sea existentes o recién establecidas)
+    if (is.null(server)) {
+      if (exists("server", envir = .GlobalEnv)) {
+        server <- get("server", envir = .GlobalEnv)
+      } else {
+        server <- "local"  # Fallback si setup() no está disponible
+      }
+    }
+
+    if (is.null(port)) {
+      if (exists("port", envir = .GlobalEnv)) {
+        port <- get("port", envir = .GlobalEnv)
+      } else {
+        port <- 5432  # Fallback si setup() no está disponible
+      }
+    }
+  }
+  cal = bizdays::create.calendar('cal', functions::dbGetTable("calendarioFeriados", server = server, port = port)$date, weekdays = c('saturday','sunday'))
   settle = ifelse(settle == 't+0', 0, 1)
   datos = functions::dbGetTable(table = "lecaps", server = server, port = port)
   df= left_join(df, datos)

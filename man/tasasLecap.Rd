@@ -23,7 +23,8 @@ tna, tea, tem, tna360, tea360, tem360 y duration de cada lecap.
 Necesita que el df tenga date, price, ticker
 }
 \examples{
+\dontrun{
 tasasLecap(df, settle = "t+1")
-
+}
 
 }

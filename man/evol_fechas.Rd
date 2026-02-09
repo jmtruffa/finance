@@ -17,12 +17,15 @@ evol_fechas(df, fecha1, fecha2, campo, campo_fecha = "date")
 }
 \value{
 Dataframe con la evolución del campo entre las dos fechas, incluyendo la variación porcentual.
+#' @examples
+df <- data.frame(
+  date = as.Date(c("2025-07-15","2025-07-31","2025-07-15","2025-07-31")),
+  id = c("A","A","B","B"),
+  price = c(100, 110, 200, 190)
+)
+evol_fechas(df, fecha1="2025-07-15", fecha2="2025-07-31", campo="price", campo_fecha="date")
 }
 \description{
 Esta función permite comparar un campo específico entre dos fechas en un dataframe.
 #' @param df Dataframe que contiene los datos.
-}
-\examples{
-evol_fechas(df, fecha1= "2025-07-15", fecha2 = "2025-07-31", campo = "price", campo_fecha = "date")
-
 }

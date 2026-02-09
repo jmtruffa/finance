@@ -18,6 +18,8 @@ Dataframe con la inflación BE
 Calcula la inflación BE a una fecha puntual. Para ejecutar un rago, deberá ser llamada cada vez y concatenar.
 }
 \examples{
+\dontrun{
 inflacionbe("2021-01-01")
 inflacionbe("2021-01-01", server = "medina", port = 14493)
+}
 }

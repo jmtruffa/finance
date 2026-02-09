@@ -4,7 +4,13 @@
 \alias{get_bandas}
 \title{get_bandas}
 \usage{
-get_bandas(end_date = "2027-12-31")
+get_bandas(
+  end_date = "2027-12-31",
+  start_date = "2025-04-14",
+  upper_start = 1400,
+  lower_start = 1000,
+  monthly_rate = 0.01
+)
 }
 \value{
 Un data frame con las bandas superior e inferior y la fecha.
