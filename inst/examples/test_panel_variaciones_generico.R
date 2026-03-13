@@ -14,9 +14,11 @@ library(bizdays)
 # -----------------------------
 
 # Fechas: últimos 2 años de datos diarios
-fechas <- seq(from = as.Date("2023-01-01"), 
-              to = Sys.Date(), 
-              by = "day")
+fechas <- seq(
+  from = as.Date("2023-01-01"),
+  to = Sys.Date(),
+  by = "day"
+)
 
 # Tickers de ejemplo (mezcla de ADRs, acciones locales, índices)
 tickers <- c("GGAL", "PAM", "BMA", "AAPL", "MSFT", "KO", "^GSPC", "^NDX")
@@ -69,14 +71,14 @@ cal_usa_existe <- tryCatch({
 if (!cal_usa_existe) {
   # Crear calendario USA con algunos feriados conocidos
   feriados_usa <- as.Date(c(
-    "2023-01-01", "2023-01-16", "2023-02-20", "2023-04-07", 
+    "2023-01-01", "2023-01-16", "2023-02-20", "2023-04-07",
     "2023-05-29", "2023-06-19", "2023-07-04", "2023-09-04",
     "2023-10-09", "2023-11-11", "2023-11-23", "2023-12-25",
     "2024-01-01", "2024-01-15", "2024-02-19", "2024-03-29",
     "2024-05-27", "2024-06-19", "2024-07-04", "2024-09-02",
     "2024-10-14", "2024-11-11", "2024-11-28", "2024-12-25"
   ))
-  
+
   bizdays::create.calendar(
     name = "cal_usa_test",
     holidays = feriados_usa,
@@ -159,9 +161,11 @@ if (is.list(resultado) && !inherits(resultado, "flextable")) {
 # -----------------------------
 
 # Agregar más tickers para forzar división en paneles
-tickers_extendidos <- c(tickers, 
-                        "YPF", "TEO", "EDN", "LOMA", "TX", 
-                        "TSLA", "GOOGL", "AMZN", "META", "NVDA")
+tickers_extendidos <- c(
+  tickers,
+  "YPF", "TEO", "EDN", "LOMA", "TX",
+  "TSLA", "GOOGL", "AMZN", "META", "NVDA"
+)
 
 # Crear datos extendidos
 datos_extendidos <- expand.grid(
@@ -232,4 +236,3 @@ resultado_sin_grupos <- panel_variaciones_generico(
 )
 
 print(resultado_sin_grupos)
-
