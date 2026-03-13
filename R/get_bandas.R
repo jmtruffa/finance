@@ -38,62 +38,6 @@ get_bandas<- function(
 #' El ajuste se aplica mensualmente (al cambio de mes) y se expande a días calendario.
 #' @return tibble con date, banda_inferior, banda_superior, y la tasa_mensual aplicada en cada día.
 #' @export
-# get_bandas2 <- function(
-#     end_date      = "2027-12-31",
-#     start_date    = "2025-04-14",
-#     upper_start   = 1400,
-#     lower_start   = 1000,
-#     monthly_rate  = NULL,          # tasa única (ej: 0.01)
-#     monthly_rates = NULL           # vector (ej: c(0.01, 0.008, 0.012, ...))
-# ) {
-#   # Validaciones
-#   if (is.null(monthly_rate) && is.null(monthly_rates)) {
-#     stop("Debe proveer monthly_rate o monthly_rates.")
-#   }
-#   if (!is.null(monthly_rate) && !is.null(monthly_rates)) {
-#     stop("Proveer solo uno: monthly_rate o monthly_rates.")
-#   }
-#
-#   start_date <- as.Date(start_date)
-#   end_date   <- as.Date(end_date)
-#   if (end_date < start_date) stop("end_date debe ser >= start_date.")
-#
-#   dates <- seq(start_date, end_date, by = "day")
-#
-#   # Identificador de mes (primer día del mes) para mapear tasas mensuales
-#   month_id <- as.Date(format(dates, "%Y-%m-01"))
-#   month_levels <- sort(unique(month_id))
-#   n_months <- length(month_levels)
-#
-#   # Construir vector de tasas mensuales por mes
-#   if (!is.null(monthly_rate)) {
-#     rates_by_month <- rep(monthly_rate, n_months)
-#   } else {
-#     if (length(monthly_rates) < n_months) {
-#       stop(sprintf(
-#         "monthly_rates tiene largo %d pero se necesitan %d (uno por mes desde start_date hasta end_date).",
-#         length(monthly_rates), n_months
-#       ))
-#     }
-#     rates_by_month <- monthly_rates[seq_len(n_months)]
-#   }
-#
-#   # Mapea cada día a la tasa de su mes
-#   rate_day <- rates_by_month[match(month_id, month_levels)]
-#
-#   # Factor diario equivalente dentro de cada mes: (1+r_m)^(1/30) (días calendario, como tu función original)
-#   daily_factor_day <- (1 + rate_day)^(1/30)
-#
-#   # Factor acumulado día a día (producto acumulado)
-#   cum_factor <- cumprod(daily_factor_day)
-#
-#   tibble::tibble(
-#     date = dates,
-#     tasa_mensual = rate_day,
-#     banda_inferior = lower_start * cum_factor,
-#     banda_superior = upper_start * cum_factor
-#   )
-# }
 get_bandas2 <- function(
     end_date      = "2027-12-31",
     start_date    = "2025-04-14",

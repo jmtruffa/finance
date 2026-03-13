@@ -134,7 +134,7 @@ resultado <- panel_variaciones_generico(
   calendarios = calendarios,
   grupos = grupos,
   nombres_display = nombres_display,
-  fecha_referencia = Sys.Date(),
+  fecha_referencia = Sys.Date() - 1,
   max_tickers_por_panel = 15,
   titulo = "Panel de Variaciones - Prueba",
   nota_pie = "Datos mock para prueba"
@@ -227,7 +227,8 @@ resultado_sin_grupos <- panel_variaciones_generico(
   calendarios = calendarios,
   grupos = NULL,  # Sin grupos
   fecha_referencia = Sys.Date(),
-  titulo = "Panel sin grupos especificados"
+  titulo = "Panel sin grupos especificados",
+  nota_pie = "Todos putos"
 )
 
 print(resultado_sin_grupos)

@@ -129,6 +129,9 @@ calcular_fechas_referencia <- function(calendario, fecha_ref, cal_fallback = "ca
     calendario <- cal_fallback
   }
 
+  # Ajustar fecha de referencia al último día hábil del calendario
+  fecha_ref <- bizdays::adjust.previous(fecha_ref, calendario)
+  
   # Calcular fechas de referencia
   # 1 día hábil antes
   date1d <- bizdays::offset(fecha_ref, -1, calendario)
