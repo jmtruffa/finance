@@ -35,7 +35,7 @@ get_bandas<- function(
 #' @title get_bandas2
 #' @description Bandas superior e inferior que ajustan en la misma dirección.
 #' Permite usar una tasa mensual fija (monthly_rate) o un vector de tasas mensuales (monthly_rates).
-#' El ajuste se aplica mensualmente (al cambio de mes) y se expande a días calendario.
+#' El ajuste se aplica mensualmente (al cambio de mes) y se expande a días corridos.
 #' @return tibble con date, banda_inferior, banda_superior, y la tasa_mensual aplicada en cada día.
 #' @export
 get_bandas2 <- function(
@@ -58,6 +58,7 @@ get_bandas2 <- function(
   end_date   <- as.Date(end_date)
   if (end_date < start_date) stop("end_date debe ser >= start_date.")
 
+  # Trabajar con días corridos
   dates <- seq(start_date, end_date, by = "day")
 
   # Identificador de mes (primer día del mes) para mapear tasas mensuales
@@ -81,13 +82,17 @@ get_bandas2 <- function(
   # Mapea cada día a la tasa de su mes
   rate_day <- rates_by_month[match(month_id, month_levels)]
 
-  # Factores diarios equivalentes (días calendario, como en tu función original)
-  daily_up   <- (1 + rate_day)^(1/30)  # <- CLAVE: la superior crece
-  daily_down <- (1 - rate_day)^(1/30)  # <- CLAVE: la inferior decrece a la misma tasa
+  # Factores por día corrido: cada tasa mensual se distribuye entre la
+  # cantidad real de días del mes calendario (no del sub-rango recibido).
+  days_por_mes <- lubridate::days_in_month(dates)
+  daily_up   <- (1 + rate_day)^(1 / days_por_mes)
+  daily_down <- (1 - rate_day)^(1 / days_por_mes)
 
-  # Factores acumulados día a día
-  cum_up   <- cumprod(daily_up)        # <- CLAVE: aplica solo a la superior
-  cum_down <- cumprod(daily_down)      # <- CLAVE: aplica solo a la inferior
+  # Factores acumulados con ancla en start_date:
+  # el primer día mantiene exactamente lower_start/upper_start y, desde el día
+  # siguiente, cada salto usa el factor del día actual (t).
+  cum_up   <- cumprod(c(1, daily_up[-1]))
+  cum_down <- cumprod(c(1, daily_down[-1]))
 
   tibble::tibble(
     date = dates,
