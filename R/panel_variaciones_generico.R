@@ -20,6 +20,9 @@
 #' @param cal_fallback Nombre del calendario \pkg{bizdays} a usar si falta el específico.
 #' @param server Host/alias para obtener feriados via \code{functions::getFeriados()}.
 #' @param port Puerto para obtener feriados via \code{functions::getFeriados()}.
+#' @param sector_order (Opcional) Vector de caracteres con el orden deseado de sectores
+#'   (ej: \code{c("BANCOS","GENERADORAS",...)}). Si se informa, se trae la tabla
+#'   \code{sectores} y se ordena la salida por ese criterio.
 #'
 #' @details
 #' Las fechas de referencia se calculan en días hábiles usando el calendario asignado
@@ -486,7 +489,8 @@ panel_variaciones_generico <- function(
   nota_pie = NULL,
   cal_fallback = "cal",
   server = NULL,
-  port = NULL
+  port = NULL,
+  sector_order = NULL
 ) {
   # Usar valores por defecto si no se proporcionan
   # Primero verificar si existen variables globales (establecidas por setup())
@@ -544,15 +548,40 @@ panel_variaciones_generico <- function(
     nombres_display = nombres_display
   )
 
-  # 5. Dividir en paneles si es necesario (respetando grupos)
+  # 5. Orden opcional por sector (tabla "sectores")
+  if (!is.null(sector_order)) {
+    sectores <- functions::dbGetTable(
+      table = "sectores",
+      server = server,
+      port = port
+    )
+
+    if (!all(c("ticker", "sector") %in% colnames(sectores))) {
+      stop("La tabla 'sectores' debe contener las columnas: ticker, sector")
+    }
+
+    panel_calculado <- panel_calculado %>%
+      dplyr::left_join(
+        sectores %>% dplyr::select(dplyr::all_of(c("ticker", "sector"))),
+        by = "ticker"
+      ) %>%
+      dplyr::mutate(
+        .sector_rank = as.integer(factor(.data$sector, levels = sector_order)),
+        .sector_rank = ifelse(is.na(.data$.sector_rank), length(sector_order) + 1L, .data$.sector_rank)
+      ) %>%
+      dplyr::arrange(.data$.sector_rank, .data$grupo, .data$ticker) %>%
+      dplyr::select(-dplyr::all_of(".sector_rank"))
+  }
+
+  # 6. Dividir en paneles si es necesario (respetando grupos)
   paneles_divididos <- dividir_en_paneles(panel_calculado, max_tickers_por_panel)
 
-  # 6. Crear flextables para cada panel
+  # 7. Crear flextables para cada panel
   flextables <- map(paneles_divididos, function(panel) {
     formatear_panel_flextable(panel, titulo = titulo, nota_pie = nota_pie)
   })
 
-  # 7. Retornar lista de flextables (o uno solo si hay solo uno)
+  # 8. Retornar lista de flextables (o uno solo si hay solo uno)
   if (length(flextables) == 1) {
     return(flextables[[1]])
   } else {
