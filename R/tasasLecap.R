@@ -40,7 +40,8 @@ tasasLecap = function(df, settle = "t+1", ...) {
   }
   cal = bizdays::create.calendar('cal', functions::dbGetTable("calendarioFeriados", server = server, port = port)$date, weekdays = c('saturday','sunday'))
   settle = ifelse(settle == 't+0', 0, 1)
-  datos = functions::dbGetTable(table = "lecaps", server = server, port = port)
+  #datos = functions::dbGetTable(table = "lecaps", server = server, port = port)
+  datos = functions::getLecaps(server = server, port = port)
   df= left_join(df, datos)
   df$settle = bizdays::add.bizdays(df$date, settle, cal = cal)
   df$dias360 = functions::days360(df$settle, df$date_vto)

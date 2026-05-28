@@ -19,5 +19,5 @@ tibble con date, banda_inferior, banda_superior, y la tasa_mensual aplicada en c
 \description{
 Bandas superior e inferior que ajustan en la misma dirección.
 Permite usar una tasa mensual fija (monthly_rate) o un vector de tasas mensuales (monthly_rates).
-El ajuste se aplica mensualmente (al cambio de mes) y se expande a días calendario.
+El ajuste se aplica mensualmente (al cambio de mes) y se expande a días corridos.
 }

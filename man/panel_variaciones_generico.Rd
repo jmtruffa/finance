@@ -15,7 +15,8 @@ panel_variaciones_generico(
   nota_pie = NULL,
   cal_fallback = "cal",
   server = NULL,
-  port = NULL
+  port = NULL,
+  sector_order = NULL
 )
 }
 \arguments{
@@ -45,6 +46,10 @@ named vector o data.frame con columnas \code{ticker} y \code{nombre}.}
 \item{server}{Host/alias para obtener feriados via \code{functions::getFeriados()}.}
 
 \item{port}{Puerto para obtener feriados via \code{functions::getFeriados()}.}
+
+\item{sector_order}{(Opcional) Vector de caracteres con el orden deseado de sectores
+(ej: \code{c("BANCOS","GENERADORAS",...)}). Si se informa, se trae la tabla
+\code{sectores} y se ordena la salida por ese criterio.}
 }
 \value{
 Un objeto \code{flextable} si el panel entra en un solo bloque, o una lista
